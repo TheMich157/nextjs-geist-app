@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String?       @unique
+  discordId     String        @unique
+  username      String
+  avatar        String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  servers       Server[]
+  serverConfigs ServerConfig[]
+}
+
+model Server {
+  id            String         @id @default(cuid())
+  discordId     String        @unique
+  name          String
+  icon          String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  users         User[]
+  config        ServerConfig?
+}
+
+model ServerConfig {
+  id                String    @id @default(cuid())
+  serverId         String    @unique
+  server           Server    @relation(fields: [serverId], references: [id])
+  userId           String
+  user             User      @relation(fields: [userId], references: [id])
+  prefix           String    @default("!")
+  djRole           String?
+  musicChannel     String?
+  defaultVolume    Int       @default(50)
+  maxVolume        Int       @default(100)
+  autoplay         Boolean   @default(false)
+  announcements    Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model RadioStation {
+  id          String    @id @default(cuid())
+  name        String
+  url         String
+  genre       String?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
